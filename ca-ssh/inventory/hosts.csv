@@ -1,0 +1,18 @@
+# host inventory: one host per line
+# columns:
+#   host        target hostname / ssh target
+#   ip          management IP used by the deployer
+#   ssh_port    sshd port
+#   groups      pipe-separated group principals allowed to log in (group:<name>)
+#   users       pipe-separated personal principals allowed (OS login names)
+#   breakglass  yes = deploy the emergency Match block on this host
+#   env         free-form label (prod/stage/...)
+#
+# Lines starting with '#' and blank lines are ignored.
+host,ip,ssh_port,groups,users,breakglass,env
+bastion-01,10.0.0.5,22,ops|sre,,yes,prod
+web-01,10.0.10.11,22,web|sre,,yes,prod
+web-02,10.0.10.12,22,web|sre,,yes,prod
+db-01,10.0.20.11,22,db|sre,dba-lead,yes,prod
+db-02,10.0.20.12,22,db|sre,,yes,prod
+ci-runner-01,10.0.30.11,22,ci,,no,stage
