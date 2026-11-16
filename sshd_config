@@ -23,6 +23,32 @@
 # Ciphers and keying
 #RekeyLimit default none
 
+# Compatibility with legacy clients.
+# The '+' prefix appends these algorithms after the built-in defaults, so
+# modern clients keep negotiating the modern (preferred) algorithms and the
+# legacy entries are only used by clients that do not support them.
+# Uncomment only the lines required by the failing clients; identify the
+# missing algorithm from the client error or "sshd -ddd" debug output.
+#
+# Pre-8.2 clients that only support classic DH key exchange:
+#KexAlgorithms +diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256,diffie-hellman-group-exchange-sha256
+#
+# Pre-7.2 clients that only sign host keys with SHA-1 ("ssh-rsa"); an RSA
+# host key (ssh_host_rsa_key) must also be present:
+#HostKeyAlgorithms +ssh-rsa
+#PubkeyAcceptedAlgorithms +ssh-rsa
+#
+# Very old clients limited to CBC ciphers:
+#Ciphers +aes128-cbc,aes192-cbc,aes256-cbc,3des-cbc
+#
+# Very old clients limited to legacy MACs (SHA-1 is already in the default
+# list; these are only needed for MD5/truncated variants):
+#MACs +hmac-md5,hmac-md5-96,hmac-sha1-96
+#
+# Extremely old clients that require SHA-1 based DH (avoid unless required;
+# SHA-1 and the 1024-bit group1 are weak):
+#KexAlgorithms +diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1
+
 # Logging
 #SyslogFacility AUTH
 #LogLevel INFO
