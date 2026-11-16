@@ -1,0 +1,25 @@
+[Unit]
+Description=Isolated legacy SSH endpoint
+Documentation=file:///etc/ssh/sshd_config.legacy
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/etc/ssh/sshd_config.legacy
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/sshd -D -f /etc/ssh/sshd_config.legacy -E /var/log/ssh/sshd-legacy.log
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Keep established sessions alive when the listener is stopped/reloaded by systemd.
+KillMode=process
+Restart=on-failure
+RestartSec=2
+
+LogsDirectory=ssh
+UMask=0077
+LimitNOFILE=65536
+TasksMax=4096
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

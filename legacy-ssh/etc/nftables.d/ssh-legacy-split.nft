@@ -1,0 +1,36 @@
+# Example nftables fragment.
+#
+# Replace:
+#   eth0         with the interface receiving client traffic
+#   10.20.30.40  with the existing SSH VIP
+#   10.10.0.0/16 with the exact legacy-device source set
+#
+# If the existing firewall uses a default-drop input chain, merge the two
+# "tcp dport 2222" rules into that chain instead of keeping the standalone
+# input chain below.
+
+table inet sshsplit {
+    set legacy_src {
+        type ipv4_addr
+        flags interval
+        elements = { 10.10.0.0/16 }
+    }
+
+    chain prerouting {
+        type nat hook prerouting priority dstnat; policy accept;
+
+        # Same VIP and same port for the devices; only whitelisted sources
+        # are redirected to the isolated listener.
+        iifname "eth0" ip daddr 10.20.30.40 tcp dport 22 ip saddr @legacy_src dnat ip to 10.255.255.1:2222
+    }
+
+    # This chain only prevents bypassing the NAT path. If the main firewall
+    # has its own default-drop chain, add these rules there as well.
+    chain input {
+        type filter hook input priority -10; policy accept;
+
+        ct state established,related accept
+        ip saddr @legacy_src ip daddr 10.255.255.1 tcp dport 2222 ct state new accept
+        tcp dport 2222 drop
+    }
+}
